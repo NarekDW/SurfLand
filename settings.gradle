@@ -1,0 +1,6 @@
+rootProject.name = 'SurfLand'
+
+include 'core',
+        'jdbc',
+        'xml',
+        'servlets'

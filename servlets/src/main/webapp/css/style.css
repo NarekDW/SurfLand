@@ -1,0 +1,86 @@
+.main{
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+/*index.jsp*/
+.abzac {
+    font-size: 32px;
+    font-weight: bold;
+    color: dodgerblue;
+}
+div.abzac {
+    text-align: center;
+    height: 40px;
+    margin: 21px auto;
+}
+.small_picture{
+    float: left;
+    width: 33%;
+    padding-left: 89px;
+}
+.big_column div{
+    float: left;
+    line-height: 50px;
+    padding-left: 145px;
+    font-size: larger;
+    text-align: left;
+}
+.big_column{
+    float: left;
+    width: 50%;
+    height: 106%;
+    padding-top: 30px;
+    text-align: center;
+}
+.footer{
+    text-align: center;
+    color: #999999;
+    padding: 39px;
+    clear: both;
+}
+
+/*registration*/
+.registerf1{
+    float: left;
+    width: 270px;
+    padding-left: 96px;
+    line-height: 40px;
+}
+.header{
+    text-align: center;
+    width: 80%;
+    height: 10%;
+    margin: auto;
+    clear: both;
+    border: double;
+}
+.left{
+    float: left;
+    width: 15%;
+    height: 100%;
+    margin: 26px;
+    text-align: center;
+    border: double;
+}
+.centr{
+    float: left;
+    width: 61%;
+    height: 100%;
+    margin-top: 27px;
+    margin-left: -7px;
+}
+.right{
+    float: left;
+    width: 12%;
+    height: 100%;
+    border: double;
+    margin-top: 27px;
+    margin-left: 25px;
+    text-align: center;
+}
+.action{
+    width: 50%;
+    float: left;
+    padding-left: 10%;
+}

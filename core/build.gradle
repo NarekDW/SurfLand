@@ -1,0 +1,5 @@
+dependencies {
+    // Tomcat internal libraries
+    compileOnly 'org.apache.tomcat:tomcat-api:+',
+            'org.apache.tomcat:tomcat-jsp-api:+'
+}
