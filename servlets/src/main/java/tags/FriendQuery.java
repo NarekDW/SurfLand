@@ -29,18 +29,18 @@ public class FriendQuery extends TagSupport {
         if (status == 2){
             pageContext.getOut().write("<h4>My friend</h4>");
             pageContext.getOut().write("<h4><a href=/deletefriend?id=" + user.getId() + ">Delete friend</a></h4>");
-            pageContext.getOut().write("<h4><a href=/writemessage?id=" + user.getId() + ">Write message</a></h4>");
+            pageContext.getOut().write("<h4><a href=/message?id=" + user.getId() + ">Write message</a></h4>");
         } else if (status == 1){
             pageContext.getOut().write("<h4>I follow this page</h4>");
             pageContext.getOut().write("<h4><a href=/deletefriend?id=" + user.getId() + ">Delete subscribe</a></h4>");
-            pageContext.getOut().write("<h4><a href=/writemessage?id=" + user.getId() + ">Write message</a></h4>");
+            pageContext.getOut().write("<h4><a href=/message?id=" + user.getId() + ">Write message</a></h4>");
         } else if (currentUser.getId() != user.getId()){
             if(status == 3){
                 pageContext.getOut().write("<h4>My follower</h4>");
                 pageContext.getOut().write("<h4><a href=/deletefriend?id=" + user.getId() + ">Delete follower</a></h4>");
             }
             pageContext.getOut().write("<h4><a href=/addfriend?id=" + user.getId() + ">Add friend</a></h4>");
-            pageContext.getOut().write("<h4><a href=/writemessage?id=" + user.getId() + ">Write message</a></h4>");
+            pageContext.getOut().write("<h4><a href=/message?id=" + user.getId() + ">Write message</a></h4>");
         }
         return SKIP_BODY;
     }

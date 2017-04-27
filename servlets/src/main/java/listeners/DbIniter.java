@@ -1,9 +1,6 @@
 package listeners;
 
-import dao.h2.H2FriendsDao;
-import dao.h2.H2MessageDao;
-import dao.h2.H2UserDao;
-import dao.h2.H2UserSearchDao;
+import dao.h2.*;
 import encrypt.StringEncryptUtil;
 import lombok.SneakyThrows;
 
@@ -22,9 +19,10 @@ import java.sql.Statement;
 import java.util.stream.Collectors;
 
 /**
- * 07.03.2017
- * <p>
- * Narek.
+ * Data base (H2 test) init, when web application start-up.
+ *
+ * 07.03.2017 by K.N.K
+ *
  */
 @WebListener
 public class DbIniter implements ServletContextListener {
@@ -35,6 +33,18 @@ public class DbIniter implements ServletContextListener {
     @Override
     @SneakyThrows
     public void contextInitialized(ServletContextEvent sce) {
+
+        // My connection pool
+//        Properties properties = new Properties();
+//        Path path = Paths.get(
+//                sce.getServletContext().getRealPath("/WEB-INF/classes/db.properties"));
+//        try(FileInputStream fileInputStream =
+//                    new FileInputStream(path.toString())){
+//            properties.load(fileInputStream);
+//        }
+//        ConnectionPool dataSource = new ConnectionPool(properties);
+
+
         Path sqlDirPath = Paths.get(
                 sce.getServletContext().getRealPath("/WEB-INF/classes/sql"));
         try (Connection connection = dataSource.getConnection();
@@ -46,22 +56,44 @@ public class DbIniter implements ServletContextListener {
                             Files.lines(filePath)
                                     .collect(Collectors.joining())
                     );
-            statement.executeBatch(); // this.getClass().getResourceAsStream("/sql")
+            statement.executeBatch();
             encryptPasswords(connection);
 
-            // Запихиваем объекты ДАО в контекст, чтобы вытаскивать его откуда угодно
+            // set DAO Objects to Context
             sce.getServletContext().setAttribute("UserDao", new H2UserDao(dataSource));
             sce.getServletContext().setAttribute("UserSearchDao", new H2UserSearchDao(dataSource));
             sce.getServletContext().setAttribute("FriendsDao", new H2FriendsDao(dataSource));
             sce.getServletContext().setAttribute("MessageDao", new H2MessageDao(dataSource));
+            sce.getServletContext().setAttribute("NewsDao", new H2NewsDao(dataSource));
+
+            // With my connection pool
+//            sce.getServletContext().setAttribute("UserDao", new H2UserDao(dataSource));
+//            sce.getServletContext().setAttribute("UserSearchDao", new H2UserSearchDao(dataSource));
+//            sce.getServletContext().setAttribute("FriendsDao", new H2FriendsDao(dataSource));
+//            sce.getServletContext().setAttribute("MessageDao", new H2MessageDao(dataSource));
+//            sce.getServletContext().setAttribute("NewsDao", new H2NewsDao(dataSource));
+//            sce.getServletContext().setAttribute("ConnectionPool", dataSource);
         }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        sce.getServletContext().removeAttribute("UserDao");
+        sce.getServletContext().removeAttribute("UserSearchDao");
+        sce.getServletContext().removeAttribute("FriendsDao");
+        sce.getServletContext().removeAttribute("MessageDao");
+        sce.getServletContext().removeAttribute("NewsDao");
+
+        // My connection pool
+//        ConnectionPool dataSourceCp = (ConnectionPool) sce.getServletContext().getAttribute("ConnectionPool");
+//        dataSourceCp.dispose();
     }
 
     @SneakyThrows
     private void encryptPasswords(Connection connection) {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT id, password FROM User")) {
-            // Обновляем пароли пользователей с учетом MD5
+            // Encrypt users password (this is for test users in 2.sql)
             while (resultSet.next()) {
                 String id = resultSet.getString("id");
                 String password = resultSet.getString("password");

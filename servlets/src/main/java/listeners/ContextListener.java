@@ -1,6 +1,4 @@
-package listeners; /**
- * 14.03.2017 by K.N.K
- */
+package listeners;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;

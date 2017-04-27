@@ -17,5 +17,6 @@ public interface HttpFilter extends Filter {
         doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
     }
 
-    void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException;
+    void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws IOException, ServletException;
 }

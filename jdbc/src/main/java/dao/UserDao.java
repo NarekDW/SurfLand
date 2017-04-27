@@ -2,15 +2,16 @@ package dao;
 
 import model.User;
 
+import java.sql.SQLException;
+
 /**
  * 07.03.2017
- * <p>
+ *
  * Narek.
  */
 public interface UserDao {
-    User createUser(User user);
-    void update(User user);
-    void remove(User user);
-
+    User createUser(User user) throws SQLException;
+    void update(User user) throws SQLException;
+    void remove(User user) throws SQLException;
     boolean isEmailRegistered(String email);
 }

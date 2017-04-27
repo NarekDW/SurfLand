@@ -2,8 +2,8 @@ package dao.h2;
 
 import dao.FriendsDao;
 import lombok.SneakyThrows;
-import model.Friend;
 import model.User;
+import services.FollowersFriendsCount;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -12,9 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 17.03.2017 by K.N.K
@@ -34,25 +32,11 @@ public class H2FriendsDao implements FriendsDao {
         dataSource = ds;
     }
 
-    @Override
-    @SneakyThrows
-    public List<User> getFriends(User user) {
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT first_user_id, second_user_id FROM Friends")) {
-            Set<Integer> from = new HashSet<>();
-            Set<Integer> to = new HashSet<>();
-            while (resultSet.next()) {
-                from.add(resultSet.getInt("first_user_id"));
-                to.add(resultSet.getInt("second_user_id"));
-            }
-            System.out.println(from);
-            System.out.println(to);
-        }
-
-
-        return null;
-    }
+    // My connection pool
+//    private static ConnectionPool dataSource;
+//    public H2FriendsDao(ConnectionPool ds){
+//        dataSource = ds;
+//    }
 
 
     /**
@@ -95,6 +79,79 @@ public class H2FriendsDao implements FriendsDao {
 
 
     /**
+     * @param idFrom - тот кто хочет удалить
+     * @param idTo   - тот кого хотят удалить
+     */
+    @Override
+    @SneakyThrows
+    public void removeFriend(int idFrom, int idTo) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement findFriends = connection.prepareStatement(
+                     "SELECT first_user_id, second_user_id, status " +
+                             "FROM Friends WHERE first_user_id = (?) AND second_user_id = (?) AND status = (?)")) {
+            boolean deleted;
+
+            // delete follow
+            findFriends.setInt(1, idFrom);
+            findFriends.setInt(2, idTo);
+            findFriends.setInt(3, FOLLOW);
+            deleted = deleteRow(idFrom, idTo, connection, findFriends);
+
+            // delete follower
+            if (!deleted) {
+                findFriends.setInt(1, idTo);
+                findFriends.setInt(2, idFrom);
+                findFriends.setInt(3, FOLLOW);
+                deleted = deleteRow(idTo, idFrom, connection, findFriends);
+            }
+
+            // delete friend
+            if (!deleted) {
+
+                // when fromId = current user id
+                findFriends.setInt(1, idFrom);
+                findFriends.setInt(2, idTo);
+                findFriends.setInt(3, FRIEND);
+                try (ResultSet resultSet = findFriends.executeQuery();
+                     PreparedStatement updateAndChange = connection.prepareStatement(
+                             "UPDATE Friends SET status = (?), first_user_id = (?), second_user_id = (?)" +
+                                     " WHERE first_user_id = (?) AND second_user_id = (?)"
+                     )) {
+                    if (resultSet.next()) {
+                        updateAndChange.setInt(1, FOLLOW);
+                        updateAndChange.setInt(2, idTo);
+                        updateAndChange.setInt(3, idFrom);
+                        updateAndChange.setInt(4, idFrom);
+                        updateAndChange.setInt(5, idTo);
+                        updateAndChange.executeUpdate();
+                        deleted = true;
+                    }
+                }
+
+
+                // when toId = current user id
+                if (!deleted) {
+                    findFriends.setInt(1, idTo);
+                    findFriends.setInt(2, idFrom);
+                    findFriends.setInt(3, FRIEND);
+                    try (ResultSet resultSet = findFriends.executeQuery();
+                         PreparedStatement updateStatus = connection.prepareStatement(
+                                 "UPDATE Friends SET status = (?) WHERE first_user_id = (?) AND second_user_id = (?)"
+                         )) {
+                        if (resultSet.next()) {
+                            updateStatus.setInt(1, FOLLOW);
+                            updateStatus.setInt(2, idTo);
+                            updateStatus.setInt(3, idFrom);
+                            updateStatus.executeUpdate();
+                        }
+                    }
+                }
+            } // end of delete friend
+        }
+    }
+
+
+    /**
      * @param firstId  - id нынешнего пользователя пользователя.
      * @param secondId - id пользователя, на чей странице мы находимся.
      */
@@ -111,13 +168,13 @@ public class H2FriendsDao implements FriendsDao {
             * status из базы соответсвует отношению firstId -> secondId*/
             statusStatementFirst.setInt(1, firstId);
             statusStatementFirst.setInt(2, secondId);
-            // Закрыть ResultSet
-            ResultSet resultSetFrom = statusStatementFirst.executeQuery();
-            if (resultSetFrom.next()) {
-                status = resultSetFrom.getInt("status");
-                return status;
-            }
 
+            try (ResultSet resultSetFrom = statusStatementFirst.executeQuery()) {
+                if (resultSetFrom.next()) {
+                    status = resultSetFrom.getInt("status");
+                    return status;
+                }
+            }
             /* Случай когда secondId первый послал запрос на добавление в друзья,
             * отношению firstId -> secondId соответсвуют: FOLLOW -> FOLLOWER; NOT FRIEND -> NONE*/
             statusStatementFirst.setInt(1, secondId);
@@ -147,7 +204,6 @@ public class H2FriendsDao implements FriendsDao {
                              " OR second_user_id = " + userId)) {
             while (resultSet.next()) {
                 if (resultSet.getInt("status") == FRIEND) {
-                    System.out.println("resultSet.getInt(\"status\") = " + resultSet.getInt("status"));
                     if (resultSet.getInt("first_user_id") == userId)
                         allFriendsId.add(resultSet.getInt("second_user_id"));
                     if (resultSet.getInt("second_user_id") == userId)
@@ -193,80 +249,58 @@ public class H2FriendsDao implements FriendsDao {
     }
 
 
-    /**
-     * @param idFrom - тот кто хочет удалить
-     * @param idTo   - тот кого хотят удалить
-     */
     @Override
     @SneakyThrows
-    public void removeFriend(int idFrom, int idTo) {
+    public List<Integer> getAllFollowAndFriends(int userId) {
+        List<Integer> allFollowsAndFriendsId = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement findFriends = connection.prepareStatement(
-                     "SELECT first_user_id, second_user_id, status " +
-                             "FROM Friends WHERE first_user_id = (?) AND second_user_id = (?) AND status = (?)")) {
-            boolean deleted;
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(
+                     "SELECT first_user_id, second_user_id " +
+                             "FROM Friends WHERE (first_user_id = " + userId +
+                             " AND status = " + FOLLOW + ") OR (first_user_id = " + userId +
+                             " OR second_user_id = " + userId +
+                             " AND status = " + FRIEND + " )")
+        ) {
 
-            // Удаление ПОДПИСКИ
-            findFriends.setInt(1, idFrom);
-            findFriends.setInt(2, idTo);
-            findFriends.setInt(3, FOLLOW);
-            deleted = deleteRow(idFrom, idTo, connection, findFriends);
 
-            // Удаление ПОДПИСЧИКА
-            if(!deleted){
-                findFriends.setInt(1, idTo);
-                findFriends.setInt(2, idFrom);
-                findFriends.setInt(3, FOLLOW);
-                deleted = deleteRow(idTo, idFrom, connection, findFriends);
+            while (resultSet.next()) {
+                if (resultSet.getInt("first_user_id") == userId)
+                    allFollowsAndFriendsId.add(resultSet.getInt("second_user_id"));
+                else
+                    allFollowsAndFriendsId.add(resultSet.getInt("first_user_id"));
             }
-
-            // Удаление друга
-            if (!deleted) {
-
-                // Случай когда Я предложил дружбу
-                findFriends.setInt(1, idFrom);
-                findFriends.setInt(2, idTo);
-                findFriends.setInt(3, FRIEND);
-                try (ResultSet resultSet = findFriends.executeQuery();
-                PreparedStatement updateAndChange = connection.prepareStatement(
-                        "UPDATE Friends SET status = (?), first_user_id = (?), second_user_id = (?)" +
-                                " WHERE first_user_id = (?) AND second_user_id = (?)"
-                )) {
-                    if(resultSet.next()){
-                        updateAndChange.setInt(1, FOLLOW);
-                        updateAndChange.setInt(2, idTo);
-                        updateAndChange.setInt(3, idFrom);
-                        updateAndChange.setInt(4,idFrom);
-                        updateAndChange.setInt(5, idTo);
-                        updateAndChange.executeUpdate();
-                        deleted = true;
-                    }
-                }
-
-
-                // Случай когда МНЕ предложили дружбу
-                if(!deleted){
-                    findFriends.setInt(1, idTo);
-                    findFriends.setInt(2, idFrom);
-                    findFriends.setInt(3, FRIEND);
-                    try (ResultSet resultSet = findFriends.executeQuery();
-                         PreparedStatement updateStatus = connection.prepareStatement(
-                                 "UPDATE Friends SET status = (?) WHERE first_user_id = (?) AND second_user_id = (?)"
-                         )) {
-                        if(resultSet.next()){
-                            updateStatus.setInt(1, FOLLOW);
-                            updateStatus.setInt(2, idTo);
-                            updateStatus.setInt(3, idFrom);
-                            updateStatus.executeUpdate();
-                        }
-                    }
-                }
-            } // Удаление друга
         }
+        allFollowsAndFriendsId.add(userId); // Учитываем новости текущего пользователя тоже
+        return allFollowsAndFriendsId;
     }
 
+
+    @Override
     @SneakyThrows
-    private boolean deleteRow(int firstUser, int secondUser, Connection connection, PreparedStatement findFriends){
+    public FollowersFriendsCount getFollowersCount(User user) {
+        int followersCount = 0;
+        int friendsCount = 0;
+        try (Connection connection = dataSource.getConnection();
+             Statement followers = connection.createStatement();
+             ResultSet followersSet = followers.executeQuery(
+                     "SELECT second_user_id FROM Friends WHERE second_user_id = " + user.getId() + " AND status = " + FOLLOW);
+             Statement friends = connection.createStatement();
+             ResultSet friendsSet = friends.executeQuery(
+                     "SELECT status FROM Friends WHERE (first_user_id = " + user.getId() + " AND status = " + FRIEND + ")" +
+                             " OR (second_user_id = " + user.getId() + " AND status = " + FRIEND + ")")) {
+            while (followersSet.next())
+                followersCount++;
+            while (friendsSet.next())
+                friendsCount++;
+        }
+        return new FollowersFriendsCount(followersCount, friendsCount);
+    }
+
+
+
+    @SneakyThrows
+    private boolean deleteRow(int firstUser, int secondUser, Connection connection, PreparedStatement findFriends) {
         try (ResultSet resultSet = findFriends.executeQuery();
              PreparedStatement deleteStatement = connection.prepareStatement(
                      "DELETE FROM Friends WHERE first_user_id = (?) AND second_user_id = (?) AND status = (?)"
@@ -293,24 +327,4 @@ public class H2FriendsDao implements FriendsDao {
         }
     }
 
-
-    @Deprecated
-    @Override
-    @SneakyThrows
-    public List<Friend> geAllFriends() {
-        List<Friend> all = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM Friends")) {
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                int idFrom = resultSet.getInt("first_user_id");
-                int idTo = resultSet.getInt("second_user_id");
-                int status = resultSet.getInt("status");
-
-                all.add(new Friend(id, idFrom, idTo, status));
-            }
-        }
-        return all;
-    }
 }

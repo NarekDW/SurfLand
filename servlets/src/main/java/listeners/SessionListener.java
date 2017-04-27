@@ -6,8 +6,10 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.HashMap;
-import java.util.HashSet;
 
+/**
+ * Save all new sessions id and sessions object to HashMap from servlet context.
+ * */
 @WebListener()
 public class SessionListener implements HttpSessionListener {
     @Override
@@ -15,11 +17,9 @@ public class SessionListener implements HttpSessionListener {
         HttpSession session = se.getSession();
         ServletContext servletContext = session.getServletContext();
         HashMap sessionMap = (HashMap) servletContext.getAttribute("sessionMap");
+        //noinspection unchecked
         sessionMap.put(session.getId(), session);
-
-        session.setAttribute("friends", new HashSet<Integer>());
-        session.setAttribute("follows", new HashSet<Integer>());
-        session.setAttribute("followers", new HashSet<Integer>());
+        session.setAttribute("locale", "ru_RU");
     }
 
     @Override
@@ -28,9 +28,6 @@ public class SessionListener implements HttpSessionListener {
         ServletContext servletContext = session.getServletContext();
         HashMap sessionMap = (HashMap) servletContext.getAttribute("sessionMap");
         sessionMap.remove(session.getId());
-
-        session.removeAttribute("friends");
-        session.removeAttribute("follows");
-        session.removeAttribute("followers");
+        session.removeAttribute("locale");
     }
 }

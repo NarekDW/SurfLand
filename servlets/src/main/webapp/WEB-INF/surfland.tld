@@ -23,6 +23,69 @@
         </attribute>
     </tag>
 
+    <tag>
+        <name>message</name>
+        <tag-class>tags.MessageQuery</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>user</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>model.User</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>contact</name>
+        <tag-class>tags.ContactQuery</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>user</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>model.User</type>
+        </attribute>
+        <attribute>
+            <name>contacts</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>services.MessageDirection</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>news</name>
+        <tag-class>tags.NewsQuery</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>user</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>model.User</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <name>followers</name>
+        <tag-class>tags.FollowersQuery</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <name>users</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.util.List</type>
+        </attribute>
+    </tag>
+
+
+    <function>
+        <name>paggination</name>
+        <function-class>tags.PaginationFunction</function-class>
+        <function-signature>java.lang.String paggination(int,int,int,java.lang.String)</function-signature>
+    </function>
+
+
+
     <!--<tag>-->
         <!--<name>allfriends</name>-->
         <!--<tag-class>tags.AllFriends</tag-class>-->

@@ -16,7 +16,8 @@ public class Address {
     private int id;
     private String country;
     private String city;
-    public Address(String country, String city){
+
+    public Address(String country, String city) {
         this.country = country;
         this.city = city;
     }

@@ -16,11 +16,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * <p>Define current user, search his followers id in data base,
+ * find users by id and send to jsp(/user/friends/followers/index.jsp)
+ * </p>
+ *
  * 18.03.2017 by K.N.K
  */
 @WebServlet("/followers")
 public class MyFollowersServlet extends HttpServlet {
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         FriendsDao friendsDao = (FriendsDao) getServletContext().getAttribute("FriendsDao");
@@ -30,7 +35,6 @@ public class MyFollowersServlet extends HttpServlet {
         HttpSession session = (HttpSession) sessionMap.get(request.getSession().getId());
         User currentUser = (User) session.getAttribute("currentUser");
 
-        // Переписать с учето FOREIGN KEY
         List<Integer> allFollowersId = friendsDao.getAllFollowers(currentUser.getId());
         List<User> allMyFollowers = searchUser.getAll().stream()
                 .filter(user -> allFollowersId.contains(user.getId()))
@@ -38,7 +42,13 @@ public class MyFollowersServlet extends HttpServlet {
 
         session.setAttribute("result", allMyFollowers);
 
-        request.setAttribute("allFriends", allMyFollowers);
-        request.getRequestDispatcher("/user/friends/").forward(request, response);
+        request.setAttribute("allfollowes", allMyFollowers);
+        request.getRequestDispatcher("/user/friends/followers/").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
     }
 }

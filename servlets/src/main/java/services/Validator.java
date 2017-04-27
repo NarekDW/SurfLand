@@ -12,16 +12,18 @@ import java.util.List;
  */
 public class Validator {
 
-    public static List<String> validate(String firstName, String lastName, String email, String password,
-                                        String country, String city, String nextTrip, String dateOfBirth, UserDao userDao) {
+    public List<String> validate(String firstName, String lastName, String email,
+                                 String password, String country, String city,
+                                 String nextTrip, String dateOfBirth, UserDao userDao) {
         List<String> errors = new ArrayList<>();
 
         String fullNameRegex = "^[\\p{L} .'-]{2,55}$";
         String passwordRegex = "^[a-zA-Z0-9]{6,20}$";
-        String emailRegex = "^[a-zA-Z0-9]{3,}@[A-Z]{0,1}[a-z]{3,5}.[a-z]{2,4}$";
+        String emailRegex = "^[a-zA-Z0-9]{3,}@[A-Z]{0,1}[a-z]{3,8}.[a-z]{2,5}$";
 
         // Check full name
         String fullName = String.format("%s %s", firstName, lastName);
+
         if (isNotRightValue(fullName, fullNameRegex)) {
             errors.add("Invalid First name or Last name");
         }
@@ -41,7 +43,7 @@ public class Validator {
         return errors;
     }
 
-    public static List<String> validate(String firstName, String lastName, String country,
+    public List<String> validate(String firstName, String lastName, String country,
                                         String city, String nextTrip, String dateOfBirth){
         List<String> errors = new ArrayList<>();
         String fullNameRegex = "^[\\p{L} .'-]{2,55}$";
@@ -59,7 +61,7 @@ public class Validator {
     }
 
     @SneakyThrows
-    private static List<String> checkCityCountryNextTripDob(String country, String city, String nextTrip, String dateOfBirth){
+    private List<String> checkCityCountryNextTripDob(String country, String city, String nextTrip, String dateOfBirth){
 
         List<String> errors = new ArrayList<>();
         String countryAndCityRegex = new String(("^[A-ZА-ЯЁ]{1,5}[a-zа-яеё]*(-{1}[A-ZА-ЯЕЁ]{0,1}[a-zа-яеё]*)*$").getBytes(),
@@ -88,11 +90,11 @@ public class Validator {
         return errors;
     }
 
-    private static boolean isNotRightValue(String value, String regex) {
+    private boolean isNotRightValue(String value, String regex) {
         return !value.matches(regex);
     }
 
-    private static boolean isNotRightDate(LocalDate dateOfBirth) {
+    private boolean isNotRightDate(LocalDate dateOfBirth) {
         return LocalDate.now().compareTo(dateOfBirth) < 0;
     }
 }

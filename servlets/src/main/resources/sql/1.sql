@@ -1,8 +1,7 @@
 CREATE TABLE Address (
   id      INT AUTO_INCREMENT PRIMARY KEY,
   country VARCHAR(100) NULL,
-  city    VARCHAR(100) NULL,
-
+  city    VARCHAR(100) NULL
 );
 
 CREATE TABLE Sex (
@@ -37,23 +36,23 @@ CREATE TABLE Friends (
 
 CREATE TABLE Message (
   id      INT AUTO_INCREMENT PRIMARY KEY,
-  first_user_id INT NOT NULL,
-  second_user_id   INT NOT NULL,
+  from_id INT NOT NULL,
+  to_id   INT NOT NULL,
   message VARCHAR(2000) NOT NULL,
   date DATE NOT NULL,
   time TIME NOT NULL,
   status  INT NOT NULL,
 
-  FOREIGN KEY (first_user_id) REFERENCES User(id),
-  FOREIGN KEY (second_user_id) REFERENCES User(id)
+  FOREIGN KEY (from_id) REFERENCES User(id),
+  FOREIGN KEY (to_id) REFERENCES User(id)
 );
 
 CREATE TABLE News(
   id      INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   news_message VARCHAR(2000) NOT NULL,
-  date DATE NOT NULL,
-  time TIME NOT NULL,
+  news_date DATE NOT NULL,
+  news_time TIME NOT NULL,
 
   FOREIGN KEY (user_id) REFERENCES User(id),
 );

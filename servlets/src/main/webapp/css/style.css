@@ -50,10 +50,10 @@ div.abzac {
 .header{
     text-align: center;
     width: 80%;
-    height: 10%;
+    height: 12%;
     margin: auto;
     clear: both;
-    border: double;
+    /*border: double;*/
 }
 .left{
     float: left;
@@ -78,6 +78,7 @@ div.abzac {
     margin-top: 27px;
     margin-left: 25px;
     text-align: center;
+    text-decoration: none;
 }
 .action{
     width: 50%;

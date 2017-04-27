@@ -1,7 +1,7 @@
 package dao;
 
-import model.Friend;
 import model.User;
+import services.FollowersFriendsCount;
 
 import java.util.List;
 
@@ -15,7 +15,6 @@ public interface FriendsDao {
     List<Integer> getAllFriends(int userId);
     List<Integer> getAllFollow(int userId);
     List<Integer> getAllFollowers(int userId);
-
-    List<Friend> geAllFriends();
-    List<User> getFriends(User user);
+    List<Integer> getAllFollowAndFriends(int userId);
+    FollowersFriendsCount getFollowersCount(User user);
 }

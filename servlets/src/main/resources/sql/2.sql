@@ -117,16 +117,3 @@ VALUES ('Юлия',
         'test11@m',
         'qwerty3',
         '5');
-
-
-CREATE TABLE Roles (
-  email VARCHAR(255) NOT NULL,
-  role  VARCHAR(15)  NOT NULL,
-  PRIMARY KEY (email, role),
-  FOREIGN KEY (email) REFERENCES User (email)
-);
-
-INSERT INTO Roles (email, role) VALUES ('test7@m', 'user');
-INSERT INTO Roles (email, role) VALUES ('test6@m', 'admin');
-INSERT INTO Roles (email, role) VALUES ('test5@m', 'user');
-INSERT INTO Roles (email, role) VALUES ('test4@m', 'user');

@@ -1,5 +1,8 @@
-
+<%--@elvariable id="errorLogin" type="java.util.String"--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<fmt:setLocale value="${sessionScope.locale}" scope="session"/>
+<fmt:setBundle basename="language.loc"/>
 <html>
 <head>
     <meta http-equiv="CONTENT-TYPE" content="text/html; utf-8">
@@ -14,13 +17,23 @@
         <div class="small_picture">
 <%--suppress CheckImageSize --%>
             <img src="_images/title.jpg" alt="surfer" width="450" height="400">
+
+            <div style="text-align: center">
+                <p><a href="/language?lang=russian">Русский</a></p>
+                <p><a href="/language?lang=english">English</a></p>
+            </div>
+
         </div>
         <div class="big_column">
-                <form name="Login" method="POST" action="user/">
-                    Login:<br/>
+                <form name="Login" method="POST" action="/login">
+
+                    <fmt:message key="login"/> <br/>
+
                     <input style="line-height: 18px; text-align: center;"
-                           type="text" name="j_username" placeholder="e-mail"/>
-                    <br/>Password:<br/>
+                           type="email" name="j_username" placeholder="e-mail" value="${param.j_username}"/>
+
+                    <br/><fmt:message key="password"/> <br/>
+
                     <input style="line-height: 18px; text-align: center;"
                            type="password" name="j_password" placeholder="password"/>
                     <br/><br/>
@@ -30,13 +43,13 @@
                 </form>
             <div style="color: maroon">
                 <ol>
-                    <li>Знакомьтесь с серферами всего мира</li>
-                    <li>Делитесь фотографими и эмоциями</li>
-                    <li>Путешествуйте вместе</li>
+                    <li><fmt:message key="p1"/></li>
+                    <li><fmt:message key="p2"/></li>
+                    <li><fmt:message key="p3"/></li>
                 </ol>
             </div>
+            <div style="color: red">${errorLogin}</div>
         </div>
-        <div style="color: red">${errorLogin}</div>
         <div class="footer">Учебная социальная сеть SL</div>
     </div>
 

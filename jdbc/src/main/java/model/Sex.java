@@ -2,7 +2,7 @@ package model;
 
 /**
  * 07.03.2017
- *
+ * <p>
  * Karapetyan N.
  */
 public enum Sex {
