@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  *
  */
 @WebListener
-public class DbIniter implements ServletContextListener {
+public class InitDataBase implements ServletContextListener {
 
     @Resource(name = "jdbc/TestDB")
     private DataSource dataSource;
@@ -43,7 +43,6 @@ public class DbIniter implements ServletContextListener {
 //            properties.load(fileInputStream);
 //        }
 //        ConnectionPool dataSource = new ConnectionPool(properties);
-
 
         Path sqlDirPath = Paths.get(
                 sce.getServletContext().getRealPath("/WEB-INF/classes/sql"));

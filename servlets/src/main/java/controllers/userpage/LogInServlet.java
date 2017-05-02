@@ -3,7 +3,6 @@ package controllers.userpage;
 import dao.FriendsDao;
 import dao.MessageDao;
 import dao.UserSearchDao;
-import dao.h2.H2MessageDao;
 import encrypt.StringEncryptUtil;
 import model.User;
 import services.FollowersFriendsCount;
@@ -20,6 +19,7 @@ import java.io.IOException;
  */
 @WebServlet("/login")
 public class LogInServlet extends HttpServlet {
+
     private static final String LOGERROR = "Invalid e-mail or password...";
 
     @Override
@@ -28,7 +28,7 @@ public class LogInServlet extends HttpServlet {
 
         UserSearchDao searchUser = (UserSearchDao) getServletContext().getAttribute("UserSearchDao");
         FriendsDao friendsDao = (FriendsDao) getServletContext().getAttribute("FriendsDao");
-        MessageDao messageDao = (H2MessageDao) getServletContext().getAttribute("MessageDao");
+        MessageDao messageDao = (MessageDao) getServletContext().getAttribute("MessageDao");
 
         String email = request.getParameter("j_username").trim();
         String password = request.getParameter("j_password").trim();
