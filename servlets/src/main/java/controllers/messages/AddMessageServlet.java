@@ -14,9 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 /**
@@ -51,8 +50,8 @@ public class AddMessageServlet extends HttpServlet {
             if(action.equals(SEND)){
                 String message = request.getParameter("msg");
                 if(message!=null && !message.isEmpty()){
-                    Date date = Date.valueOf(LocalDate.now());
-                    Time time = new Time(new java.util.Date().getTime());
+                    LocalDate date = LocalDate.now();
+                    LocalTime time = LocalTime.now();
                     messageDao.addMessage(
                             new Message(currentUser.getId(), userTo.getId(), message,
                                     date, time, MessageStatus.NOTREAD));

@@ -46,8 +46,8 @@ public class H2MessageDao implements MessageDao {
             newMessage.setInt(1, message.getFromId());
             newMessage.setInt(2, message.getToId());
             newMessage.setString(3, message.getMessage());
-            newMessage.setDate(4, message.getDate());
-            newMessage.setTime(5, message.getTime());
+            newMessage.setDate(4, message.getSqlDate());
+            newMessage.setTime(5, message.getSqlTime());
             newMessage.setInt(6, message.getStatus());
             newMessage.executeUpdate();
         }
