@@ -9,6 +9,8 @@ import services.MessageDirection;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,9 +73,10 @@ public class H2MessageDao implements MessageDao {
                 int fromId = resultSet.getInt("from_id");
                 int toId = resultSet.getInt("to_id");
                 String message = resultSet.getString("message");
-                Date date = resultSet.getDate("date");
-                Time time = resultSet.getTime("time");
+                LocalDate date = resultSet.getDate("date").toLocalDate();
+                LocalTime time = resultSet.getTime("time").toLocalTime();
                 int status = resultSet.getInt("status");
+
                 messages.add(new Message(id, fromId, toId, message, date, time, status));
 
                 if (userFrom.getId() == toId && status == NOTREAD) {

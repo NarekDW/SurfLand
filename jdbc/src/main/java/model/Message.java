@@ -1,5 +1,6 @@
 package model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.time.LocalTime;
  */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Message {
     private int id;
     private int fromId;
@@ -29,14 +31,6 @@ public class Message {
         this.date = date;
         this.time = time;
         this.status = status;
-    }
-
-    public Message(int id, int fromId, int toId, String message, Date date, Time time, int status) {
-        this(fromId, toId, message,
-                LocalDate.parse(date.toString()),
-                LocalTime.parse(time.toString()),
-                status);
-        this.id = id;
     }
 
     public Date getSqlDate(){

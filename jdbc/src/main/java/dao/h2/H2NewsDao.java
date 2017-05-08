@@ -40,8 +40,8 @@ public class H2NewsDao implements NewsDao {
                              "VALUES (?,?,?,?)")) {
             createNews.setInt(1, news.getUserId());
             createNews.setString(2, news.getMessage());
-            createNews.setDate(3, news.getDate());
-            createNews.setTime(4, news.getTime());
+            createNews.setDate(3, news.getSqlDate());
+            createNews.setTime(4, news.getSqlTime());
             createNews.executeUpdate();
         }
     }
@@ -62,8 +62,8 @@ public class H2NewsDao implements NewsDao {
                                 resultSet.getInt("id"),
                                 resultSet.getInt("user_id"),
                                 resultSet.getString("news_message"),
-                                resultSet.getDate("news_date"),
-                                resultSet.getTime("news_time")
+                                resultSet.getDate("news_date").toLocalDate(),
+                                resultSet.getTime("news_time").toLocalTime()
                         )
                 );
             }
@@ -89,8 +89,8 @@ public class H2NewsDao implements NewsDao {
                                 resultSet.getInt("id"),
                                 resultSet.getInt("user_id"),
                                 resultSet.getString("news_message"),
-                                resultSet.getDate("news_date"),
-                                resultSet.getTime("news_time")
+                                resultSet.getDate("news_date").toLocalDate(),
+                                resultSet.getTime("news_time").toLocalTime()
                         )
                 );
             }

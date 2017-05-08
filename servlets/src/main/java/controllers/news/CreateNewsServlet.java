@@ -12,10 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 /**
@@ -35,15 +34,16 @@ public class CreateNewsServlet extends HttpServlet {
         User currentUser = (User) session.getAttribute("currentUser");
 
         String message = request.getParameter("msg");
-        if(message != null && !message.isEmpty()){
-                    Date date = Date.valueOf(LocalDate.now());
-                    Time time = new Time(new java.util.Date().getTime());
+        if (message != null && !message.isEmpty()) {
+            LocalDate date = LocalDate.now();
+            LocalTime time = LocalTime.now();
 
             try {
                 newsDao.createNews(new News(currentUser.getId(), message, date, time));
+
             } catch (SQLException e) {
-                Logger log = (Logger)getServletContext().getAttribute("log4j");
-                log.error("News not created by - "+currentUser, e);
+                Logger log = (Logger) getServletContext().getAttribute("log4j");
+                log.error("News not created by - " + currentUser, e);
             }
 
         }
