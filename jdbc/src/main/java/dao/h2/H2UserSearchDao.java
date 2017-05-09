@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -136,18 +137,21 @@ public class H2UserSearchDao implements UserSearchDao {
                 .filter(user -> (user.getEmail().equals(email)
                         && user.getPasswordHash().equals(password))).findAny();
 
-        return any.isPresent() ? any.get() : null;
+        return any.orElse(null);
     }
 
 
     @SneakyThrows
-    private User createUser(ResultSet resultSet, Connection connection) {
+    private User createUser(final ResultSet resultSet, final Connection connection) {
         int id = resultSet.getInt("id");
         String firstName = resultSet.getString("first_name");
         String lastName = resultSet.getString("last_name");
-        LocalDate dateOfBirth = null;
-        Date dob = resultSet.getDate("date_of_birth");
-        if (dob != null) dateOfBirth = dob.toLocalDate();
+
+        CompletableFuture<LocalDate> dateOfBirth = CompletableFuture
+                .supplyAsync(() -> unchecked(resultSet.getDate("date_of_birth")))
+                .thenApplyAsync(Date::toLocalDate)
+                .exceptionally(throwable -> null);
+
         int sexId = resultSet.getInt("sex_id");
         String nextTrip = resultSet.getString("next_trip");
         String email = resultSet.getString("email");
@@ -162,6 +166,7 @@ public class H2UserSearchDao implements UserSearchDao {
             }
         }
         int addressId = resultSet.getInt("address_id");
+
         Address address = new Address();
         address.setId(addressId);
         try (Statement statement3 = connection.createStatement();
@@ -172,7 +177,18 @@ public class H2UserSearchDao implements UserSearchDao {
                 address.setCity(resultSet3.getString("city"));
             }
         }
-        return new User(id, firstName, lastName, dateOfBirth, sex, nextTrip, email, password, address);
+        return new User(id, firstName, lastName,
+                dateOfBirth.join(), sex, nextTrip,
+                email, password, address);
+    }
+
+
+    private <T> T unchecked(T t){
+        try{
+            return t;
+        } catch (Exception e){
+            throw new RuntimeException();
+        }
     }
 
 }

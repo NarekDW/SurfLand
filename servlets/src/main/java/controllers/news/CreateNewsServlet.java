@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 20.03.2017 by K.N.K
@@ -40,10 +41,11 @@ public class CreateNewsServlet extends HttpServlet {
 
             try {
                 newsDao.createNews(new News(currentUser.getId(), message, date, time));
-
             } catch (SQLException e) {
-                Logger log = (Logger) getServletContext().getAttribute("log4j");
-                log.error("News not created by - " + currentUser, e);
+                CompletableFuture.runAsync(() -> {
+                    Logger log = (Logger) getServletContext().getAttribute("log4j");
+                    log.error("News not created by - " + currentUser, e);
+                });
             }
 
         }

@@ -43,12 +43,14 @@ public class MyNewsServlet extends HttpServlet {
         List<Integer> allFollowAndFriends = friendsDao.getAllFollowAndFriends(currentUser.getId());
         List<News> myNews = newsDao.getNews()
                 .stream()
+                .parallel()
                 .filter(news -> allFollowAndFriends.contains(news.getUserId()))
                 .collect(Collectors.toList());
 
         String newsSearch = request.getParameter("news");
         if(newsSearch!=null && !newsSearch.isEmpty()){
             myNews = myNews.stream()
+                    .parallel()
                     .filter(news -> news.getMessage().matches("(?u)(?i).*" + newsSearch + ".*"))
                     .collect(Collectors.toList());
         }

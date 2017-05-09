@@ -41,6 +41,7 @@ public class AllNewsServlet extends HttpServlet {
         List<News> myNews = newsDao.getNews();
         List<User> allUsers = searchUser.getAll();
         String newsSearch = request.getParameter("news");
+
         if(newsSearch!=null && !newsSearch.isEmpty()){
             myNews = myNews.stream()
                     .filter(news -> news.getMessage().matches("(?u)(?i).*" + newsSearch + ".*"))
